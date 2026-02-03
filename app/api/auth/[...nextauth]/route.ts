@@ -29,7 +29,7 @@ const handler = NextAuth({
 
                     const isPasswordValid = await bcrypt.compare(
                         credentials.password,
-                        user.password
+                        user.password as string
                     )
 
                     if (!isPasswordValid) {
@@ -71,7 +71,7 @@ const handler = NextAuth({
     session: {
         strategy: 'jwt',
     },
-    secret: process.env.NEXTAUTH_SECRET,
+    secret: process.env.NEXTAUTH_SECRET || 'fallback_secret',
     debug: process.env.NODE_ENV === 'development',
 })
 
