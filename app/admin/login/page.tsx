@@ -112,6 +112,18 @@ export default function AdminLoginPage() {
                                 'Giriş Yap'
                             )}
                         </button>
+
+                        <button
+                            type="button"
+                            onClick={() => {
+                                setEmail('admin@avukat.com')
+                                setPassword('admin123')
+                                // Optional: auto-submit logic could go here, but filling is safer for now to let user see
+                            }}
+                            className="w-full text-center text-sm text-gray-500 hover:text-[#c9a961] hover:underline mt-2"
+                        >
+                            Hızlı Giriş (Admin)
+                        </button>
                     </form>
                 </div>
 

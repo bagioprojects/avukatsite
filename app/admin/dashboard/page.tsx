@@ -1,46 +1,59 @@
-'use client'
-
+import { prisma } from '@/lib/prisma'
 import { FileText, Users, Newspaper, Calendar, TrendingUp, Eye } from 'lucide-react'
+import Link from 'next/link'
 
-export default function AdminDashboard() {
+export const dynamic = 'force-dynamic'
+
+export default async function AdminDashboard() {
+    // Fetch real stats
+    const [articleCount, userCount, categoryCount] = await Promise.all([
+        prisma.article.count(),
+        prisma.user.count(),
+        prisma.category.count(),
+    ])
+
     const stats = [
-        { icon: FileText, label: 'Toplam Sayfa', value: '12', change: '+2', color: 'from-blue-500 to-blue-600' },
-        { icon: Newspaper, label: 'Makaleler', value: '28', change: '+5', color: 'from-green-500 to-green-600' },
-        { icon: Users, label: 'Ekip Üyeleri', value: '8', change: '+1', color: 'from-purple-500 to-purple-600' },
-        { icon: Calendar, label: 'Randevular', value: '15', change: '+3', color: 'from-orange-500 to-orange-600' },
-        { icon: Eye, label: 'Aylık Ziyaretçi', value: '2.4K', change: '+12%', color: 'from-pink-500 to-pink-600' },
-        { icon: TrendingUp, label: 'Dönüşüm', value: '8.2%', change: '+1.2%', color: 'from-cyan-500 to-cyan-600' },
+        { icon: Newspaper, label: 'Makaleler', value: articleCount.toString(), change: 'Aktif', color: 'from-blue-500 to-blue-600' },
+        { icon: Users, label: 'Kullanıcılar', value: userCount.toString(), change: 'Yönetici', color: 'from-purple-500 to-purple-600' },
+        { icon: FileText, label: 'Kategoriler', value: categoryCount.toString(), change: 'Toplam', color: 'from-green-500 to-green-600' },
+        { icon: Calendar, label: 'Randevular', value: '15', change: '+3 bu hafta', color: 'from-orange-500 to-orange-600' },
     ]
+
+    const recentArticles = await prisma.article.findMany({
+        take: 5,
+        orderBy: { updatedAt: 'desc' },
+        include: { author: true }
+    })
 
     return (
         <div className="space-y-6">
             {/* Welcome */}
-            <div className="rounded-xl bg-gradient-to-br from-[#2d3e50] to-[#3d4e60] p-8 text-white">
+            <div className="rounded-xl bg-gradient-to-br from-[#2d3e50] to-[#3d4e60] p-8 text-white shadow-lg">
                 <h1 className="mb-2 text-3xl font-bold">Hoş Geldiniz!</h1>
                 <p className="text-gray-300">
-                    Sevinç Hukuk Bürosu admin paneline hoş geldiniz. Sisteminizi buradan yönetebilirsiniz.
+                    Sistem yönetimi ve içerik güncelleme paneli.
                 </p>
             </div>
 
             {/* Stats Grid */}
-            <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
+            <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-4">
                 {stats.map((stat, index) => {
                     const Icon = stat.icon
                     return (
                         <div
                             key={index}
-                            className="overflow-hidden rounded-xl border border-gray-200 bg-white shadow-sm transition-shadow hover:shadow-md"
+                            className="group overflow-hidden rounded-xl border border-gray-200 bg-white shadow-sm transition-all hover:shadow-lg hover:-translate-y-1"
                         >
                             <div className="p-6">
                                 <div className="flex items-start justify-between">
                                     <div>
                                         <p className="mb-1 text-sm font-medium text-gray-600">{stat.label}</p>
                                         <p className="text-3xl font-bold text-gray-900">{stat.value}</p>
-                                        <p className="mt-2 text-sm text-green-600">
-                                            <span className="font-semibold">{stat.change}</span> son ayda
+                                        <p className="mt-2 text-xs font-semibold text-gray-400 uppercase tracking-wide">
+                                            {stat.change}
                                         </p>
                                     </div>
-                                    <div className={`flex h-12 w-12 items-center justify-center rounded-lg bg-gradient-to-br ${stat.color}`}>
+                                    <div className={`flex h-12 w-12 items-center justify-center rounded-lg bg-gradient-to-br ${stat.color} shadow-md group-hover:scale-110 transition-transform`}>
                                         <Icon className="h-6 w-6 text-white" />
                                     </div>
                                 </div>
@@ -54,71 +67,67 @@ export default function AdminDashboard() {
             <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
                 {/* Recent Articles */}
                 <div className="rounded-xl border border-gray-200 bg-white p-6 shadow-sm">
-                    <h2 className="mb-4 text-lg font-bold text-gray-900">Son Makaleler</h2>
-                    <div className="space-y-3">
-                        {[
-                            { title: 'Ceza Hukukunda Savunma Hakları', date: '15 Ocak 2024' },
-                            { title: 'Borçlar Hukukunda Sözleşme', date: '10 Ocak 2024' },
-                            { title: 'Şirket Birleşmeleri', date: '5 Ocak 2024' },
-                        ].map((article, idx) => (
-                            <div key={idx} className="flex items-center justify-between border-b border-gray-100 pb-3 last:border-0">
+                    <div className="flex items-center justify-between mb-6">
+                        <h2 className="text-lg font-bold text-gray-900">Son Güncellenen Makaleler</h2>
+                        <Link href="/admin/makaleler" className="text-sm font-semibold text-[#c9a961] hover:text-[#b89851]">Tümünü Gör</Link>
+                    </div>
+
+                    <div className="space-y-4">
+                        {recentArticles.map((article: any) => (
+                            <div key={article.id} className="flex items-center justify-between border-b border-gray-100 pb-4 last:border-0 last:pb-0">
                                 <div>
-                                    <p className="font-medium text-gray-900">{article.title}</p>
-                                    <p className="text-sm text-gray-500">{article.date}</p>
+                                    <p className="font-medium text-gray-900 line-clamp-1">{(article.title as any).tr}</p>
+                                    <div className="flex items-center gap-2 mt-1">
+                                        <span className={`text-xs px-2 py-0.5 rounded-full ${article.status === 'PUBLISHED' ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-600'}`}>
+                                            {article.status === 'PUBLISHED' ? 'Yayında' : 'Taslak'}
+                                        </span>
+                                        <span className="text-xs text-gray-400">
+                                            {new Date(article.updatedAt).toLocaleDateString('tr-TR')}
+                                        </span>
+                                    </div>
                                 </div>
-                                <button className="text-sm font-semibold text-[#c9a961] hover:text-[#b89851]">
-                                    Düzenle
-                                </button>
+                                <Link
+                                    href={`/admin/makaleler/${article.id}`}
+                                    className="p-2 text-gray-400 hover:text-[#c9a961] transition-colors"
+                                >
+                                    <FileText className="w-5 h-5" />
+                                </Link>
                             </div>
                         ))}
+                        {recentArticles.length === 0 && (
+                            <p className="text-gray-500 text-center py-4">Henüz makale bulunmuyor.</p>
+                        )}
                     </div>
                 </div>
 
-                {/* Upcoming Appointments */}
+                {/* Quick Actions */}
                 <div className="rounded-xl border border-gray-200 bg-white p-6 shadow-sm">
-                    <h2 className="mb-4 text-lg font-bold text-gray-900">Yaklaşan Randevular</h2>
-                    <div className="space-y-3">
-                        {[
-                            { client: 'Ahmet Yılmaz', date: '1 Şubat 2024', time: '10:00' },
-                            { client: 'Ayşe Demir', date: '1 Şubat 2024', time: '14:00' },
-                            { client: 'Mehmet Kaya', date: '2 Şubat 2024', time: '09:00' },
-                        ].map((appointment, idx) => (
-                            <div key={idx} className="flex items-center justify-between border-b border-gray-100 pb-3 last:border-0">
-                                <div>
-                                    <p className="font-medium text-gray-900">{appointment.client}</p>
-                                    <p className="text-sm text-gray-500">
-                                        {appointment.date} - {appointment.time}
-                                    </p>
-                                </div>
-                                <button className="text-sm font-semibold text-[#c9a961] hover:text-[#b89851]">
-                                    Detay
-                                </button>
+                    <h2 className="mb-6 text-lg font-bold text-gray-900">Hızlı İşlemler</h2>
+                    <div className="grid grid-cols-2 gap-4">
+                        <Link href="/admin/makaleler/new" className="flex flex-col items-center justify-center rounded-xl border-2 border-dashed border-gray-300 p-6 text-center transition-all hover:border-[#c9a961] hover:bg-[#c9a961]/5 group">
+                            <div className="w-12 h-12 rounded-full bg-gray-100 flex items-center justify-center mb-3 group-hover:bg-[#c9a961] transition-colors">
+                                <Newspaper className="h-6 w-6 text-gray-500 group-hover:text-white" />
                             </div>
-                        ))}
-                    </div>
-                </div>
-            </div>
+                            <p className="font-bold text-gray-700 group-hover:text-[#c9a961]">Yeni Makale Yaz</p>
+                            <span className="text-xs text-gray-400 mt-1">AI Destekli Editör</span>
+                        </Link>
 
-            {/* Quick Actions */}
-            <div className="rounded-xl border border-gray-200 bg-white p-6 shadow-sm">
-                <h2 className="mb-4 text-lg font-bold text-gray-900">Hızlı İşlemler</h2>
-                <div className="grid grid-cols-2 gap-4 md:grid-cols-4">
-                    <button className="rounded-lg border-2 border-dashed border-gray-300 p-4 text-center transition-colors hover:border-[#c9a961] hover:bg-gray-50">
-                        <FileText className="mx-auto mb-2 h-8 w-8 text-gray-400" />
-                        <p className="text-sm font-semibold text-gray-700">Yeni Sayfa</p>
-                    </button>
-                    <button className="rounded-lg border-2 border-dashed border-gray-300 p-4 text-center transition-colors hover:border-[#c9a961] hover:bg-gray-50">
-                        <Newspaper className="mx-auto mb-2 h-8 w-8 text-gray-400" />
-                        <p className="text-sm font-semibold text-gray-700">Yeni Makale</p>
-                    </button>
-                    <button className="rounded-lg border-2 border-dashed border-gray-300 p-4 text-center transition-colors hover:border-[#c9a961] hover:bg-gray-50">
-                        <Users className="mx-auto mb-2 h-8 w-8 text-gray-400" />
-                        <p className="text-sm font-semibold text-gray-700">Ekip Üyesi Ekle</p>
-                    </button>
-                    <button className="rounded-lg border-2 border-dashed border-gray-300 p-4 text-center transition-colors hover:border-[#c9a961] hover:bg-gray-50">
-                        <Calendar className="mx-auto mb-2 h-8 w-8 text-gray-400" />
-                        <p className="text-sm font-semibold text-gray-700">Randevu Listesi</p>
-                    </button>
+                        <button className="flex flex-col items-center justify-center rounded-xl border-2 border-dashed border-gray-300 p-6 text-center transition-all hover:border-[#c9a961] hover:bg-[#c9a961]/5 group">
+                            <div className="w-12 h-12 rounded-full bg-gray-100 flex items-center justify-center mb-3 group-hover:bg-[#c9a961] transition-colors">
+                                <Users className="h-6 w-6 text-gray-500 group-hover:text-white" />
+                            </div>
+                            <p className="font-bold text-gray-700 group-hover:text-[#c9a961]">Kullanıcı Ekle</p>
+                            <span className="text-xs text-gray-400 mt-1">Yönetici veya Editör</span>
+                        </button>
+
+                        <button className="flex flex-col items-center justify-center rounded-xl border-2 border-dashed border-gray-300 p-6 text-center transition-all hover:border-[#c9a961] hover:bg-[#c9a961]/5 group">
+                            <div className="w-12 h-12 rounded-full bg-gray-100 flex items-center justify-center mb-3 group-hover:bg-[#c9a961] transition-colors">
+                                <Calendar className="h-6 w-6 text-gray-500 group-hover:text-white" />
+                            </div>
+                            <p className="font-bold text-gray-700 group-hover:text-[#c9a961]">Randevular</p>
+                            <span className="text-xs text-gray-400 mt-1">Takvimi Görüntüle</span>
+                        </button>
+                    </div>
                 </div>
             </div>
         </div>

@@ -1,9 +1,7 @@
 import NextAuth from 'next-auth'
 import CredentialsProvider from 'next-auth/providers/credentials'
-import { PrismaClient } from '@prisma/client'
+import { prisma } from '@/lib/prisma'
 import bcrypt from 'bcryptjs'
-
-const prisma = new PrismaClient()
 
 const handler = NextAuth({
     providers: [
@@ -16,7 +14,7 @@ const handler = NextAuth({
             async authorize(credentials) {
                 try {
                     if (!credentials?.email || !credentials?.password) {
-                        throw new Error('Lütfen email ve şifre giriniz')
+                        return null
                     }
 
                     const user = await prisma.user.findUnique({
@@ -24,16 +22,16 @@ const handler = NextAuth({
                     })
 
                     if (!user || !user.password) {
-                        throw new Error('Geçersiz email veya şifre')
+                        return null
                     }
 
                     const isPasswordValid = await bcrypt.compare(
-                        credentials.password,
+                        credentials.password as string,
                         user.password as string
                     )
 
                     if (!isPasswordValid) {
-                        throw new Error('Geçersiz email veya şifre')
+                        return null
                     }
 
                     return {
@@ -44,7 +42,7 @@ const handler = NextAuth({
                     }
                 } catch (error) {
                     console.error('Auth Error:', error)
-                    throw error
+                    return null
                 }
             },
         }),
@@ -53,7 +51,7 @@ const handler = NextAuth({
         async jwt({ token, user }) {
             if (user) {
                 token.role = user.role
-                token.id = user.id
+                token.id = user.id as string
             }
             return token
         },
@@ -67,12 +65,13 @@ const handler = NextAuth({
     },
     pages: {
         signIn: '/admin/login',
+        error: '/admin/login', // Redirect error to login page
     },
     session: {
         strategy: 'jwt',
     },
     secret: process.env.NEXTAUTH_SECRET || 'fallback_secret',
-    debug: process.env.NODE_ENV === 'development',
+    debug: true, // Enable debug always for now to see server logs
 })
 
 export { handler as GET, handler as POST }
