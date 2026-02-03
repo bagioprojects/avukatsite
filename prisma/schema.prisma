@@ -1,0 +1,156 @@
+// This is your Prisma schema file
+// Learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Page {
+  id         String   @id @default(cuid())
+  slug       String   @unique
+  title      Json     // { tr: "", en: "", de: "", es: "", ru: "", ar: "" }
+  content    Json     // Multi-language content
+  metaTitle  Json
+  metaDesc   Json
+  status     Status   @default(DRAFT)
+  template   String   @default("default")
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+  
+  seo        SEO?
+  
+  @@index([slug])
+  @@index([status])
+}
+
+model Article {
+  id          String    @id @default(cuid())
+  slug        String    @unique
+  title       Json      // Multi-language
+  content     Json      // Multi-language
+  excerpt     Json      // Multi-language
+  coverImage  String?
+  authorId    String
+  categoryId  String
+  status      Status    @default(DRAFT)
+  publishedAt DateTime?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  
+  author      User      @relation(fields: [authorId], references: [id], onDelete: Cascade)
+  category    Category  @relation(fields: [categoryId], references: [id])
+  seo         SEO?
+  
+  @@index([slug])
+  @@index([status])
+  @@index([authorId])
+  @@index([categoryId])
+}
+
+model SEO {
+  id         String  @id @default(cuid())
+  pageId     String? @unique
+  articleId  String? @unique
+  metaTitle  Json    // Multi-language
+  metaDesc   Json    // Multi-language
+  keywords   Json    // Multi-language array
+  ogImage    String?
+  schema     Json?   // JSON-LD Structured Data
+  
+  page       Page?    @relation(fields: [pageId], references: [id], onDelete: Cascade)
+  article    Article? @relation(fields: [articleId], references: [id], onDelete: Cascade)
+}
+
+model Menu {
+  id        String   @id @default(cuid())
+  name      Json     // Multi-language { tr: "Ana Sayfa", en: "Home" }
+  url       String
+  parentId  String?
+  order     Int      @default(0)
+  location  Location // HEADER or FOOTER
+  createdAt DateTime @default(now())
+  
+  parent    Menu?  @relation("MenuHierarchy", fields: [parentId], references: [id], onDelete: Cascade)
+  children  Menu[] @relation("MenuHierarchy")
+  
+  @@index([location])
+  @@index([order])
+}
+
+model Media {
+  id        String    @id @default(cuid())
+  filename  String
+  url       String
+  type      MediaType
+  size      Int
+  alt       Json?     // Multi-language alt text
+  createdAt DateTime  @default(now())
+  
+  @@index([type])
+}
+
+model User {
+  id        String    @id @default(cuid())
+  email     String    @unique
+  name      String
+  password  String    // Hashed
+  role      Role      @default(EDITOR)
+  avatar    String?
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  
+  articles  Article[]
+  
+  @@index([email])
+}
+
+model Category {
+  id        String    @id @default(cuid())
+  name      Json      // Multi-language
+  slug      String    @unique
+  createdAt DateTime  @default(now())
+  
+  articles  Article[]
+  
+  @@index([slug])
+}
+
+model SiteSettings {
+  id        String  @id @default(cuid())
+  siteName  Json    // Multi-language
+  logo      String?
+  favicon   String?
+  contact   Json    // { email, phone, address }
+  social    Json    // { facebook, twitter, linkedin, etc. }
+  analytics String? // Google Analytics ID
+}
+
+enum Status {
+  DRAFT
+  PUBLISHED
+  ARCHIVED
+}
+
+enum Role {
+  SUPER_ADMIN
+  ADMIN
+  EDITOR
+  VIEWER
+}
+
+enum Location {
+  HEADER
+  FOOTER
+  SIDEBAR
+}
+
+enum MediaType {
+  IMAGE
+  VIDEO
+  DOCUMENT
+}

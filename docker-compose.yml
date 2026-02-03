@@ -1,0 +1,40 @@
+version: '3.8'
+
+services:
+  app:
+    container_name: avukat-site
+    build:
+      context: .
+      dockerfile: Dockerfile
+    restart: always
+    ports:
+      - "3000:3000"
+    environment:
+      - DATABASE_URL=postgresql://postgres:postgres@db:5432/avukat_db?schema=public
+      - NEXTAUTH_URL=http://localhost:3000
+      - NEXTAUTH_SECRET=supersecretkey123
+      - NODE_ENV=production
+    depends_on:
+      - db
+    networks:
+      - avukat-network
+
+  db:
+    container_name: avukat-db
+    image: postgres:15-alpine
+    restart: always
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgrespassword
+      POSTGRES_DB: avukat_db
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - avukat-network
+
+networks:
+  avukat-network:
+    driver: bridge
+
+volumes:
+  postgres_data:
