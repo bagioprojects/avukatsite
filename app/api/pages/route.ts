@@ -1,51 +1,26 @@
+
 import { NextResponse } from 'next/server'
-import prisma from '@/lib/db'
+import { PageService } from '@/services/page.service'
 
-// GET all pages
-export async function GET(request: Request) {
+export async function POST(req: Request) {
     try {
-        const { searchParams } = new URL(request.url)
-        const status = searchParams.get('status')
+        const body = await req.json()
+        const { title, content, slug, status, template } = body
 
-        const pages = await prisma.page.findMany({
-            where: status ? { status: status as any } : undefined,
-            orderBy: { createdAt: 'desc' },
-            include: {
-                seo: true,
-            },
+        // i18n structure placeholder (saving TR by default)
+        const page = await PageService.createPage({
+            title: { tr: title },
+            content: { tr: content },
+            slug: slug || 'page-' + Date.now(),
+            status: status || 'DRAFT',
+            template: template || 'default',
+            metaTitle: { tr: title },
+            metaDesc: { tr: '' }
         })
 
-        return NextResponse.json({ success: true, data: pages })
+        return NextResponse.json(page)
     } catch (error) {
-        return NextResponse.json(
-            { success: false, error: 'Failed to fetch pages' },
-            { status: 500 }
-        )
-    }
-}
-
-// POST create new page
-export async function POST(request: Request) {
-    try {
-        const body = await request.json()
-
-        const page = await prisma.page.create({
-            data: {
-                slug: body.slug,
-                title: body.title,
-                content: body.content,
-                metaTitle: body.metaTitle,
-                metaDesc: body.metaDesc,
-                status: body.status || 'DRAFT',
-                template: body.template || 'default',
-            },
-        })
-
-        return NextResponse.json({ success: true, data: page }, { status: 201 })
-    } catch (error) {
-        return NextResponse.json(
-            { success: false, error: 'Failed to create page' },
-            { status: 500 }
-        )
+        console.error('Page Create Error', error)
+        return NextResponse.json({ error: 'Failed' }, { status: 500 })
     }
 }

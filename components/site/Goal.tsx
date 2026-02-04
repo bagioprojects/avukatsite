@@ -64,47 +64,39 @@ export function Goal() {
             </div>
 
             <div className="container mx-auto px-4 lg:px-6 relative z-10">
-                <div className="max-w-4xl">
+                <div className="max-w-5xl">
                     {/* Small Label */}
                     <Reveal>
-                        <span className="text-[#c09767] font-semibold tracking-wider uppercase mb-4 block">
-                            SEVİNÇ HUKUK BÜROSU
+                        <span className="text-[#c09767] font-bold tracking-[0.3em] uppercase mb-8 block text-xs">
+                            Hukuk ve Vizyon
                         </span>
                     </Reveal>
 
                     {/* Main Heading */}
                     <Reveal delay={0.3}>
-                        <h2 className="text-[#0e193e] text-4xl md:text-5xl lg:text-6xl font-bold font-serif mb-12">
-                            Amacımız
+                        <h2 className="text-[#182141] text-5xl md:text-6xl lg:text-8xl font-bold font-serif mb-16 leading-none tracking-tight">
+                            Hukukun Üstünlüğü, <br />
+                            İnsanın <span className="text-[#c09767] italic font-light underline decoration-gray-200 underline-offset-8">Onuru</span>.
                         </h2>
                     </Reveal>
 
-                    <div className="space-y-8">
-                        {/* Paragraph 1 */}
-                        <div className="overflow-hidden">
-                            <StaggeredText
-                                text="Kaliteli hukuk hizmetleri sunuyoruz. Hizmet sunarken her müvekkile personaal yaklaşım sağlıyor ve sürelere sadık kalıyoruz."
-                                className="text-gray-600 text-lg md:text-xl leading-relaxed"
-                                delay={0.2}
-                            />
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-12 lg:gap-20">
+                        {/* Column 1 */}
+                        <div className="space-y-10">
+                            <Reveal delay={0.4}>
+                                <p className="text-gray-500 text-xl md:text-2xl leading-relaxed font-light">
+                                    Hizmet sunarken her müvekkile <span className="text-[#182141] font-bold italic">kişisel</span> yaklaşım sağlıyor, hukuki süreçlerin karmaşıklığını net ve şeffaf bir dille çözüme kavuşturuyoruz.
+                                </p>
+                            </Reveal>
                         </div>
 
-                        {/* Paragraph 2 */}
-                        <div className="overflow-hidden">
-                            <StaggeredText
-                                text="Hukuki süreçlerin her aşamasında müvekkillerimize şeffaf, güvenilir ve çözüm odaklı bir hizmet sunmayı ilke edindik. Zamanında ve etkili müdahalelerle hak kaybı yaşanmamasını sağlıyoruz."
-                                className="text-gray-600 text-lg md:text-xl leading-relaxed"
-                                delay={0.4}
-                            />
-                        </div>
-
-                        {/* Paragraph 3 */}
-                        <div className="overflow-hidden">
-                            <StaggeredText
-                                text="Ekibimiz, güncel mevzuata ve yüksek mahkeme kararlarına hakim, sorumluluk bilinci yüksek profesyonellerden oluşmaktadır. Müvekkillerimizin bize olan güveni, başarımızın en büyük teminatıdır."
-                                className="text-gray-600 text-lg md:text-xl leading-relaxed"
-                                delay={0.6}
-                            />
+                        {/* Column 2 */}
+                        <div className="space-y-10">
+                            <Reveal delay={0.6}>
+                                <p className="text-gray-400 text-lg md:text-xl leading-loose font-light border-l-4 border-[#c09767] pl-8">
+                                    Ekibimiz, güncel mevzuata ve yüksek mahkeme kararlarına hakim, sorumluluk bilinci yüksek profesyonellerden oluşmaktadır. Müvekkillerimizin bize olan güveni, başarımızın en büyük teminatıdır.
+                                </p>
+                            </Reveal>
                         </div>
                     </div>
                 </div>

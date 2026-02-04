@@ -1,7 +1,15 @@
 import Link from 'next/link'
 import { Calendar, User } from 'lucide-react'
 
-const articles = [
+interface ArticleItem {
+    id: string | number;
+    title: string;
+    author: string;
+    date: string;
+    href: string;
+}
+
+const defaultArticles = [
     {
         id: 1,
         title: 'İcra Takibi Sürecinde Sıkça Sorulan Sorular',
@@ -67,7 +75,7 @@ const articles = [
     },
 ]
 
-export function Articles() {
+export function Articles({ items = defaultArticles }: { items?: ArticleItem[] }) {
     return (
         <section className="bg-gray-50 py-16 lg:py-24">
             <div className="container mx-auto px-4">
@@ -78,7 +86,7 @@ export function Articles() {
                 </div>
 
                 <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
-                    {articles.map((article) => (
+                    {items.map((article) => (
                         <Link
                             key={article.id}
                             href={article.href}

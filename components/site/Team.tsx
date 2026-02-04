@@ -21,12 +21,19 @@ import { Reveal } from '@/components/ui/Reveal'
 // (it works in this environment usually) OR I will copy them to public folder if I can find it.
 // Let's check public folder existence first.
 
-const team = [
+interface TeamMember {
+    id: string | number;
+    name: string;
+    role: string;
+    image: string;
+}
+
+const defaultTeam = [
     {
         id: 1,
         name: 'Vladimir Sadekov',
         role: 'Yönetici Ortak, Avukat',
-        image: 'lawyer_portrait_1_1769942223705.png' // derived from tool output
+        image: 'lawyer_portrait_1_1769942223705.png'
     },
     {
         id: 2,
@@ -42,7 +49,7 @@ const team = [
     }
 ]
 
-export function Team() {
+export function Team({ members = defaultTeam }: { members?: TeamMember[] }) {
     const [width, setWidth] = useState(0)
     const carousel = useRef<HTMLDivElement>(null)
     const x = useMotionValue(0)
@@ -113,7 +120,7 @@ export function Team() {
                             style={{ x }}
                             onDragEnd={handleDragEnd}
                         >
-                            {team.map((member) => (
+                            {members.map((member) => (
                                 <motion.div
                                     key={member.id}
                                     className="min-w-[340px] md:min-w-[400px] h-[540px] relative rounded-[2.5rem] overflow-hidden group shadow-2xl border border-gray-100"

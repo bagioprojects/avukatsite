@@ -3,10 +3,12 @@ import { Header, Footer } from '@/components/site'
 import { notFound } from 'next/navigation'
 
 // Dynamic metadata for SEO
-export async function generateMetadata({ params }: { params: { slug: string } }): Promise<Metadata> {
+export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
+    const { slug } = await params
+    const displaySlug = slug.replace(/-/g, ' ').toUpperCase()
     return {
-        title: `${params.slug.replace(/-/g, ' ').toUpperCase()} | Sevinç Hukuk Bürosu`,
-        description: `${params.slug.replace(/-/g, ' ')} konusunda profesyonel hukuki danışmanlık hizmetleri.`,
+        title: `${displaySlug} | Sevinç Hukuk Bürosu`,
+        description: `${displaySlug} konusunda profesyonel hukuki danışmanlık hizmetleri.`,
     }
 }
 
@@ -126,8 +128,9 @@ const serviceData: Record<string, any> = {
     },
 }
 
-export default function ServicePage({ params }: { params: { slug: string } }) {
-    const service = serviceData[params.slug]
+export default async function ServicePage({ params }: { params: Promise<{ slug: string }> }) {
+    const { slug } = await params
+    const service = serviceData[slug]
 
     if (!service) {
         notFound()

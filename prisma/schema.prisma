@@ -6,8 +6,8 @@ generator client {
 }
 
 datasource db {
-  provider = "postgresql"
-  url      = env("DATABASE_URL")
+  provider = "sqlite"
+  url      = "file:./dev.db"
 }
 
 model Page {
@@ -101,6 +101,10 @@ model User {
   password  String    // Hashed
   role      Role      @default(EDITOR)
   avatar    String?
+  title     Json?     // Multi-language: "Senior Partner" etc.
+  bio       Json?     // Multi-language
+  phone     String?
+  emailShow Boolean   @default(true)
   createdAt DateTime  @default(now())
   updatedAt DateTime  @updatedAt
   
@@ -130,6 +134,35 @@ model SiteSettings {
   analytics String? // Google Analytics ID
 }
 
+model Appointment {
+  id        String            @id @default(cuid())
+  name      String
+  email     String
+  phone     String
+  date      DateTime
+  message   String?
+  status    AppointmentStatus @default(PENDING)
+  createdAt DateTime          @default(now())
+  updatedAt DateTime          @updatedAt
+  
+  @@index([date])
+  @@index([status])
+}
+
+model Message {
+  id        String   @id @default(cuid())
+  name      String
+  email     String
+  phone     String?
+  subject   String?
+  content   String
+  isRead    Boolean  @default(false)
+  createdAt DateTime @default(now())
+  
+  @@index([createdAt])
+  @@index([isRead])
+}
+
 enum Status {
   DRAFT
   PUBLISHED
@@ -153,4 +186,12 @@ enum MediaType {
   IMAGE
   VIDEO
   DOCUMENT
+}
+
+enum AppointmentStatus {
+  PENDING
+  CONFIRMED
+  COMPLETED
+  CANCELLED
+  ARCHIVED
 }

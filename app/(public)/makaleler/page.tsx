@@ -15,11 +15,12 @@ export const metadata = {
 export default async function ArticlesPage({
     searchParams,
 }: {
-    searchParams: { page?: string; category?: string; q?: string }
+    searchParams: Promise<{ page?: string; cat?: string; q?: string }>
 }) {
-    const page = Number(searchParams.page) || 1
-    const categorySlug = searchParams.category || 'all'
-    const searchTerm = searchParams.q || ''
+    const resolvedSearchParams = await searchParams
+    const page = Number(resolvedSearchParams.page) || 1
+    const categorySlug = resolvedSearchParams.cat || 'all'
+    const searchTerm = resolvedSearchParams.q || ''
     const pageSize = 9
 
     // Build Where Clause

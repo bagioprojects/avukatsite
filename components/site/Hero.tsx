@@ -30,43 +30,46 @@ export function Hero() {
                 </motion.div>
             </div>
 
-            <div className="container mx-auto px-4 lg:px-6 relative z-10 w-full pt-12 pb-32 lg:py-0">
+            <div className="container mx-auto px-4 lg:px-6 relative z-10 w-full pt-20 pb-40 lg:py-0">
                 <div className="flex flex-col lg:flex-row items-center">
 
                     {/* Text Content - Left Side (60%) */}
-                    <div className="w-full lg:w-[60%] pr-0 lg:pr-12 relative z-10">
+                    <div className="w-full lg:w-[55%] pr-0 lg:pr-12 relative z-10">
                         <Reveal>
-                            <span className="text-[#c09767] font-semibold tracking-[0.2em] text-[10px] md:text-xs uppercase mb-4 block">
-                                Sevinç Hukuk Bürosu
+                            <span className="text-[#c09767] font-bold tracking-[0.3em] text-[11px] md:text-xs uppercase mb-6 block">
+                                Sevinç Hukuk Bürosu & Danışmanlık
                             </span>
                         </Reveal>
 
                         <Reveal delay={0.2}>
-                            <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold text-white font-serif leading-tight mb-5 tracking-tight">
-                                Hukuki Sorunlarınız İçin <br /> <span className="text-[#c09767]">Güvenilir</span> Çözümler.
+                            <h1 className="text-4xl md:text-5xl lg:text-7xl font-bold text-white font-serif leading-[1.1] mb-8 tracking-tight">
+                                Hukukta <span className="italic font-light">Zarafet</span> <br />
+                                ve <span className="text-[#c09767]">Keskin</span> Çözümler.
                             </h1>
                         </Reveal>
 
                         <Reveal delay={0.3}>
-                            <p className="text-gray-300 text-sm md:text-base leading-relaxed max-w-lg font-light mb-8 opacity-90">
-                                25 yılı aşkın tecrübemizle, müvekkillerimize en doğru hukuki desteği sağlıyor ve haklarını en iyi şekilde savunuyoruz.
+                            <p className="text-gray-300 text-base md:text-lg leading-relaxed max-w-xl font-light mb-10 opacity-80">
+                                25 yılı aşkın tecrübemizle, müvekkillerimize en yüksek standartlarda hukuki destek sağlıyoruz. Eston ve Türk hukuku arasında köprü kuruyoruz.
                             </p>
                         </Reveal>
 
                         <Reveal delay={0.4}>
-                            <div className="flex flex-col sm:flex-row gap-3">
-                                <a
-                                    href="/iletisim"
-                                    className="bg-[#c09767] text-white px-7 py-3 rounded-full font-medium hover:bg-[#b08855] transition-all text-xs md:text-sm tracking-wide shadow-lg shadow-[#c09767]/20"
+                            <div className="flex flex-col sm:flex-row gap-4">
+                                <Link
+                                    href="https://wa.me/905551234567"
+                                    target="_blank"
+                                    className="bg-[#c09767] text-white px-10 py-4 rounded-full font-bold hover:bg-[#b08855] transition-all text-sm tracking-wide shadow-xl shadow-[#c09767]/20 flex items-center justify-center gap-2 group"
                                 >
-                                    İletişime Geçin
-                                </a>
-                                <a
-                                    href="/randevu"
-                                    className="border border-white/20 text-white px-7 py-3 rounded-full font-medium hover:bg-white/10 transition-all text-center backdrop-blur-sm text-xs md:text-sm tracking-wide"
+                                    WhatsApp ile Danışın
+                                    <span className="group-hover:translate-x-1 transition-transform">→</span>
+                                </Link>
+                                <Link
+                                    href="/#iletisim"
+                                    className="border border-white/30 text-white px-10 py-4 rounded-full font-bold hover:bg-white/10 transition-all text-center backdrop-blur-sm text-sm tracking-wide"
                                 >
-                                    Online Randevu
-                                </a>
+                                    Online Randevu Al
+                                </Link>
                             </div>
                         </Reveal>
                     </div>

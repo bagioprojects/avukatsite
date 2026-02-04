@@ -1,0 +1,12 @@
+{
+    "admin": {
+        "dashboard": "Dashboard",
+        "articles": "Articles",
+        "settings": "Settings"
+    },
+    "nav": {
+        "home": "Home",
+        "about": "About Us",
+        "contact": "Contact"
+    }
+}

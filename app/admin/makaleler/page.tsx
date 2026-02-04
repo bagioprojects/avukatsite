@@ -1,118 +1,126 @@
+
 import { prisma } from '@/lib/prisma'
 import Link from 'next/link'
-import { Plus, Search, Edit, Trash2, Eye } from 'lucide-react'
+import { Plus, Search, Newspaper, Filter, ArrowUpRight } from 'lucide-react'
+import { ArticleActions } from '@/components/admin/ArticleActions'
+import { ArticleImage } from '@/components/admin/ArticleImage'
+import { FileText } from 'lucide-react'
+import { ArticleService } from '@/services/article.service'
 
 export default async function ArticlesManagementPage() {
-    const articles = await prisma.article.findMany({
-        orderBy: { updatedAt: 'desc' },
-        include: {
-            category: true,
-            author: true
-        }
-    })
+    const articles = await ArticleService.getAllArticles()
 
     return (
-        <div className="space-y-6">
-            <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+        <div className="space-y-8">
+            {/* Ambient Background for Page (Local) */}
+            <div className="fixed top-0 left-64 w-[500px] h-[500px] bg-[#c9a961]/5 rounded-full blur-[120px] pointer-events-none" />
+            <div className="fixed bottom-0 right-0 w-[500px] h-[500px] bg-[#2d3e50]/5 rounded-full blur-[120px] pointer-events-none" />
+
+            {/* Header Section */}
+            <div className="relative flex flex-col md:flex-row justify-between items-start md:items-center gap-6 z-10">
                 <div>
-                    <h1 className="text-2xl font-bold text-gray-900">Makale Yönetimi</h1>
-                    <p className="text-gray-500">Blog yazılarını oluşturun, düzenleyin veya silin.</p>
+                    <h1 className="text-3xl font-serif font-bold text-gray-900 flex items-center gap-3">
+                        <div className="p-2 bg-[#2d3e50] rounded-lg text-white">
+                            <Newspaper className="w-6 h-6" />
+                        </div>
+                        Makale Yönetimi
+                    </h1>
+                    <p className="text-gray-500 mt-2 pl-1">Blog yazılarını yönetin, analiz edin ve yayınlayın.</p>
                 </div>
+
                 <Link
                     href="/admin/makaleler/new"
-                    className="flex items-center gap-2 bg-[#c9a961] hover:bg-[#b08a5d] text-white px-5 py-2.5 rounded-lg font-semibold transition-colors shadow-sm"
+                    className="group relative flex items-center gap-2 bg-gradient-to-r from-[#c9a961] to-[#b08a5d] text-white px-6 py-3 rounded-xl font-bold shadow-lg shadow-[#c9a961]/20 hover:shadow-xl hover:scale-105 transition-all"
                 >
-                    <Plus className="w-5 h-5" />
-                    Yeni Makale Ekle
+                    <Plus className="w-5 h-5 group-hover:rotate-90 transition-transform" />
+                    Yeni Makale Yaz
                 </Link>
             </div>
 
-            {/* Filter/Search Bar (Optional for now) */}
-            <div className="bg-white p-4 rounded-xl border border-gray-200 shadow-sm flex gap-4">
-                <div className="relative flex-grow max-w-md">
-                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 w-5 h-5" />
+            {/* Stats/Filter Bar */}
+            <div className="relative z-10 bg-white/60 backdrop-blur-xl border border-white/50 p-4 rounded-2xl shadow-sm flex flex-col md:flex-row gap-4 items-center justify-between">
+                <div className="flex items-center gap-2 text-sm text-gray-600 font-medium px-2">
+                    <span className="flex items-center gap-1.5 bg-white px-3 py-1.5 rounded-lg border border-gray-100 shadow-sm">
+                        <span className="w-2 h-2 rounded-full bg-green-500" />
+                        Yayında ({articles.filter((a: any) => a.status === 'PUBLISHED').length})
+                    </span>
+                    <span className="flex items-center gap-1.5 bg-white px-3 py-1.5 rounded-lg border border-gray-100 shadow-sm">
+                        <span className="w-2 h-2 rounded-full bg-yellow-500" />
+                        Taslak ({articles.filter((a: any) => a.status === 'DRAFT').length})
+                    </span>
+                </div>
+
+                <div className="relative flex-grow max-w-md w-full">
+                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 w-4 h-4" />
                     <input
                         type="text"
                         placeholder="Makale başlıklarında ara..."
-                        className="w-full pl-10 pr-4 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-[#c9a961]/20 focus:border-[#c9a961]"
+                        className="w-full pl-10 pr-10 py-2.5 rounded-xl border-none bg-white shadow-sm focus:ring-2 focus:ring-[#c9a961]/20 placeholder-gray-400 text-sm"
                     />
+                    <button className="absolute right-2 top-1/2 -translate-y-1/2 p-1.5 hover:bg-gray-100 rounded-lg text-gray-400 transition-colors">
+                        <Filter className="w-4 h-4" />
+                    </button>
                 </div>
             </div>
 
-            {/* Articles Table */}
-            <div className="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
-                <table className="w-full text-left">
-                    <thead className="bg-[#f8f9fa] border-b border-gray-200">
+            {/* Articles List (Premium Cards/Table Hybrid) */}
+            <div className="relative z-10 bg-white/80 backdrop-blur-xl rounded-3xl border border-white/60 shadow-xl overflow-hidden">
+                <table className="w-full text-left border-collapse">
+                    <thead className="bg-gray-50/50 border-b border-gray-100">
                         <tr>
-                            <th className="px-6 py-4 font-semibold text-gray-700">Başlık</th>
-                            <th className="px-6 py-4 font-semibold text-gray-700">Kategori</th>
-                            <th className="px-6 py-4 font-semibold text-gray-700">Durum</th>
-                            <th className="px-6 py-4 font-semibold text-gray-700">Tarih</th>
-                            <th className="px-6 py-4 font-semibold text-gray-700 text-right">İşlemler</th>
+                            <th className="px-8 py-5 text-xs font-bold text-gray-400 uppercase tracking-wider">İçerik</th>
+                            <th className="px-6 py-5 text-xs font-bold text-gray-400 uppercase tracking-wider">Kategori</th>
+                            <th className="px-6 py-5 text-xs font-bold text-gray-400 uppercase tracking-wider">Durum</th>
+                            <th className="px-6 py-5 text-xs font-bold text-gray-400 uppercase tracking-wider">Tarih</th>
+                            <th className="px-8 py-5 text-xs font-bold text-gray-400 uppercase tracking-wider text-right">İşlemler</th>
                         </tr>
                     </thead>
                     <tbody className="divide-y divide-gray-100">
-                        {articles.map((article: any) => (
-                            <tr key={article.id} className="hover:bg-gray-50 group transition-colors">
-                                <td className="px-6 py-4">
-                                    <div className="flex items-center gap-3">
-                                        <div className="w-10 h-10 rounded-lg bg-gray-100 flex-shrink-0 overflow-hidden">
-                                            {article.coverImage ? (
-                                                // eslint-disable-next-line @next/next/no-img-element
-                                                <img src={article.coverImage} alt="" className="w-full h-full object-cover" />
-                                            ) : (
-                                                <div className="w-full h-full flex items-center justify-center text-gray-400 bg-gray-200">
-                                                    <FileText className="w-5 h-5" />
-                                                </div>
-                                            )}
+                        {articles.length === 0 ? (
+                            <tr>
+                                <td colSpan={5} className="px-8 py-12 text-center text-gray-500">
+                                    Henüz hiç makale bulunmuyor. Yeni bir tane yazmaya ne dersiniz?
+                                </td>
+                            </tr>
+                        ) : articles.map((article: any) => (
+                            <tr key={article.id} className="group hover:bg-blue-50/30 transition-colors">
+                                <td className="px-8 py-5">
+                                    <div className="flex items-center gap-4">
+                                        <div className="w-12 h-12 rounded-xl bg-gray-100 flex-shrink-0 overflow-hidden shadow-sm group-hover:scale-105 transition-transform border border-gray-200">
+                                            <ArticleImage src={article.coverImage} alt={(article.title as any).tr} />
                                         </div>
                                         <div>
-                                            <p className="font-medium text-gray-900 line-clamp-1 max-w-xs ">{(article.title as any).tr}</p>
-                                            <p className="text-xs text-gray-500">{article.author.name}</p>
+                                            <p className="font-bold text-gray-900 line-clamp-1 max-w-md text-base group-hover:text-blue-700 transition-colors">
+                                                {(article.title as any).tr}
+                                            </p>
+                                            <div className="flex items-center gap-2 mt-1">
+                                                <span className="text-xs text-gray-400 font-medium">{(article.author as any)?.name || 'Admin'}</span>
+                                                <span className="w-1 h-1 rounded-full bg-gray-300" />
+                                                <span className="text-xs text-gray-400">Okuma Süresi: 5 dk</span>
+                                            </div>
                                         </div>
                                     </div>
                                 </td>
-                                <td className="px-6 py-4">
-                                    <span className="inline-block px-2.5 py-1 rounded-full text-xs font-semibold bg-gray-100 text-gray-600">
-                                        {(article.category.name as any).tr}
+                                <td className="px-6 py-5">
+                                    <span className="inline-flex items-center gap-1.5 px-3 py-1 bg-white border border-gray-200 rounded-lg text-xs font-semibold text-gray-600 shadow-sm">
+                                        <span className="w-1.5 h-1.5 rounded-full bg-[#c9a961]" />
+                                        {(article.category as any)?.name?.tr || 'Genel'}
                                     </span>
                                 </td>
-                                <td className="px-6 py-4">
-                                    <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold ${article.status === 'PUBLISHED'
-                                        ? 'bg-green-100 text-green-700'
-                                        : 'bg-yellow-100 text-yellow-700'
+                                <td className="px-6 py-5">
+                                    <span className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold border ${article.status === 'PUBLISHED'
+                                        ? 'bg-green-50 border-green-200 text-green-700'
+                                        : 'bg-yellow-50 border-yellow-200 text-yellow-700'
                                         }`}>
-                                        <span className={`w-1.5 h-1.5 rounded-full ${article.status === 'PUBLISHED' ? 'bg-green-500' : 'bg-yellow-500'}`}></span>
+                                        <span className={`w-2 h-2 rounded-full ${article.status === 'PUBLISHED' ? 'bg-green-500' : 'bg-yellow-500'} animate-pulse`} />
                                         {article.status === 'PUBLISHED' ? 'Yayında' : 'Taslak'}
                                     </span>
                                 </td>
-                                <td className="px-6 py-4 text-sm text-gray-500">
-                                    {new Date(article.updatedAt).toLocaleDateString('tr-TR')}
+                                <td className="px-6 py-5 text-sm text-gray-500 font-medium tabular-nums">
+                                    {new Date(article.updatedAt).toLocaleDateString('tr-TR', { day: 'numeric', month: 'long', year: 'numeric' })}
                                 </td>
-                                <td className="px-6 py-4 text-right">
-                                    <div className="flex items-center justify-end gap-2">
-                                        <Link
-                                            href={`/makaleler/${article.slug}`}
-                                            target="_blank"
-                                            className="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-lg transition-colors"
-                                            title="Sitede Gör"
-                                        >
-                                            <Eye className="w-4 h-4" />
-                                        </Link>
-                                        <Link
-                                            href={`/admin/makaleler/${article.id}`}
-                                            className="p-2 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
-                                            title="Düzenle"
-                                        >
-                                            <Edit className="w-4 h-4" />
-                                        </Link>
-                                        <button
-                                            className="p-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors"
-                                            title="Sil"
-                                        >
-                                            <Trash2 className="w-4 h-4" />
-                                        </button>
-                                    </div>
+                                <td className="px-8 py-5 text-right">
+                                    <ArticleActions id={article.id} slug={article.slug} />
                                 </td>
                             </tr>
                         ))}
@@ -120,25 +128,5 @@ export default async function ArticlesManagementPage() {
                 </table>
             </div>
         </div>
-    )
-}
-
-function FileText(props: any) {
-    return (
-        <svg
-            {...props}
-            xmlns="http://www.w3.org/2000/svg"
-            width="24"
-            height="24"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="2"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-        >
-            <path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z" />
-            <polyline points="14 2 14 8 20 8" />
-        </svg>
     )
 }

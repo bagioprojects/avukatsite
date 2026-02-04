@@ -138,13 +138,13 @@ export function Footer() {
                 </div>
 
                 {/* Bottom Bar */}
-                <div className="mt-12 border-t border-gray-700 pt-8 text-center text-sm">
-                    <p>
-                        © {new Date().getFullYear()} Sevinç Hukuk Bürosu. Tüm hakları saklıdır. |{' '}
-                        <Link href="/gizlilik-politikasi" className="hover:text-[#c9a961]">
-                            Gizlilik Politikası
-                        </Link>
-                    </p>
+                <div className="mt-16 border-t border-white/5 pt-8 flex flex-col md:flex-row items-center justify-between gap-4 text-xs font-medium text-gray-500">
+                    <p>© {new Date().getFullYear()} Sevinç Hukuk Bürosu. Tüm hakları saklıdır.</p>
+                    <div className="flex items-center gap-6">
+                        <Link href="/gizlilik-politikasi" className="hover:text-[#c9a961] transition-colors">Gizlilik Politikası</Link>
+                        <Link href="/kullanim-kosullari" className="hover:text-[#c9a961] transition-colors">Kullanım Koşulları</Link>
+                        <Link href="/cerez-politikasi" className="hover:text-[#c9a961] transition-colors">Çerez Politikası</Link>
+                    </div>
                 </div>
             </div>
         </footer>

@@ -1,0 +1,12 @@
+{
+    "admin": {
+        "dashboard": "Gösterge Paneli",
+        "articles": "Makaleler",
+        "settings": "Ayarlar"
+    },
+    "nav": {
+        "home": "Ana Sayfa",
+        "about": "Hakkımızda",
+        "contact": "İletişim"
+    }
+}

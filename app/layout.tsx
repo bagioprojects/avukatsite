@@ -1,90 +1,47 @@
-import type { Metadata } from 'next'
+import { Source_Serif_4, Source_Sans_3 } from 'next/font/google'
 import './globals.css'
+import { Toaster } from 'sonner'
+import { prisma } from '@/lib/prisma'
 
-export const metadata: Metadata = {
-    title: {
-        default: 'Sevinç Hukuk Bürosu | Profesyonel Hukuki Danışmanlık',
-        template: '%s | Sevinç Hukuk Bürosu',
-    },
-    description: 'Ceza, aile, ticaret, medeni ve idari hukuk alanlarında 25 yılı aşkın deneyimle profesyonel hukuki danışmanlık hizmeti.',
-    keywords: ['avukat', 'hukuk bürosu', 'ceza hukuku', 'aile hukuku', 'ticaret hukuku', 'istanbul avukat', 'hukuki danışmanlık'],
-    authors: [{ name: 'Sevinç Hukuk Bürosu' }],
-    creator: 'Sevinç Hukuk Bürosu',
-    publisher: 'Sevinç Hukuk Bürosu',
-    metadataBase: new URL('http://localhost:3000'),
-    alternates: {
-        canonical: '/',
-        languages: {
-            'tr': '/',
-            'en': '/en',
-            'ru': '/ru',
+const serif = Source_Serif_4({
+    subsets: ['latin'],
+    variable: '--font-serif',
+    weight: ['300', '400', '700'],
+})
+
+const sans = Source_Sans_3({
+    subsets: ['latin'],
+    variable: '--font-sans',
+    weight: ['300', '400', '500', '600', '700'],
+})
+
+export async function generateMetadata() {
+    const settings = await prisma.siteSettings.findFirst()
+    const siteName = (settings?.siteName as any)?.tr || 'Sevinç Hukuk Bürosu'
+
+    return {
+        title: {
+            template: `%s | ${siteName}`,
+            default: `${siteName} | Profesyonel Hukuki Danışmanlık`,
         },
-    },
-    openGraph: {
-        type: 'website',
-        locale: 'tr_TR',
-        url: 'http://localhost:3000',
-        title: 'Sevinç Hukuk Bürosu | Profesyonel Hukuki Danışmanlık',
-        description: 'Ceza, aile, ticaret, medeni ve idari hukuk alanlarında 25 yılı aşkın deneyimle profesyonel hukuki danışmanlık hizmeti.',
-        siteName: 'Sevinç Hukuk Bürosu',
-    },
-    twitter: {
-        card: 'summary_large_image',
-        title: 'Sevinç Hukuk Bürosu',
-        description: 'Profesyonel hukuki danışmanlık hizmeti',
-    },
-    robots: {
-        index: true,
-        follow: true,
-        googleBot: {
-            index: true,
-            follow: true,
-            'max-video-preview': -1,
-            'max-image-preview': 'large',
-            'max-snippet': -1,
-        },
-    },
-    verification: {
-        google: 'google-site-verification-code',
-    },
+        description: 'Uzman avukatlarımızla profesyonel hukuk danışmanlığı.',
+        icons: {
+            icon: settings?.favicon || '/favicon.ico',
+        }
+    }
 }
 
 export default function RootLayout({
     children,
-}: Readonly<{
+}: {
     children: React.ReactNode
-}>) {
+}) {
     return (
-        <html lang="tr">
-            <head>
-                {/* Preconnect to external domains for performance */}
-                <link rel="preconnect" href="https://fonts.googleapis.com" />
-                <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
-
-                {/* Schema.org JSON-LD for Organization */}
-                <script
-                    type="application/ld+json"
-                    dangerouslySetInnerHTML={{
-                        __html: JSON.stringify({
-                            '@context': 'https://schema.org',
-                            '@type': 'LegalService',
-                            name: 'Sevinç Hukuk Bürosu',
-                            description: 'Profesyonel hukuki danışmanlık hizmeti',
-                            url: 'http://localhost:3000',
-                            telephone: '+905551234567',
-                            address: {
-                                '@type': 'PostalAddress',
-                                streetAddress: 'Merkez Mah., Büyükdere Cad. No:123',
-                                addressLocality: 'İstanbul',
-                                addressCountry: 'TR',
-                            },
-                            areaServed: 'TR',
-                            priceRange: '$$',
-                        }),
-                    }}
-                />
-            </head>
-            <body className="antialiased">{children}</body>
+        <html lang="tr" className={`${serif.variable} ${sans.variable} scroll-smooth`}>
+            <body className="font-sans antialiased text-[#182141]">
+                {children}
+                <Toaster position="top-right" richColors />
+            </body>
         </html>
     )
 }
